@@ -1,25 +1,24 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css"
+import MainPage from "./MainPage";
+import {Route, Routes} from "react-router-dom";
+import Shopping from "./Shopping";
+import Account from "./Account";
+import Carrello from "./Carrello";
+
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  return(
+    <>
+      {/*<MainPage />*/}
+      <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/shopping" element={<Shopping />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/carrello" element={<Carrello />} />
+      </Routes>
+      </>
+    )
 }
 
 export default App;
