@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {Card} from "react-bootstrap";
 import "./App.css"
 import {Link} from "react-router-dom";
@@ -8,6 +8,7 @@ import Footer from "./Footer";
 
 
 export default function MainPage(){
+
     return(
         <div className="vh-100 d-flex flex-column justify-content-between">
             {/*header*/}

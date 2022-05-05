@@ -1,17 +1,32 @@
 import React, {useEffect, useState} from "react";
 import NavbarEl from "./Navbar";
 import useFetch from "./services/useFetch";
-import {Card} from "react-bootstrap";
+import {Badge, Card, Offcanvas} from "react-bootstrap";
 import {Pagination, Button} from "react-bootstrap";
 import PageItem from 'react-bootstrap/PageItem'
-import Sidebar from "./Sidebar";
 import Alerts from "./Alerts";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import CheckIcon from "@mui/icons-material/Check";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-export default function Shopping() {
+export default function Shopping(props) {
     const data = useFetch();
     const [pageActive, setPageActive] = useState(1);
     const [cart, setCart] = useState([]);
     const [showAlert, setShowAlert] = useState(false);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    const deleteItem = (index) => {
+        setCart(item => item.filter((el, i) => i !== index));
+    };
+    const deleteAll = () => setCart([]);
+
+
+    let initialValue = 0;
+    const total = cart.map(el => el.price).reduce((prevValue, currValue) => prevValue + currValue, initialValue);
+
 
     // Pagination
     let items = [];
@@ -31,6 +46,10 @@ export default function Shopping() {
     useEffect(() => {
          setTimeout(() => showAlert ? setShowAlert(false): null, 3000);
     }, [showAlert]);
+
+    useEffect(() => {
+        props.shareDataToCart(cart)
+    }, [cart])
 
     function renderProduct(p) {
         return (
@@ -52,7 +71,46 @@ export default function Shopping() {
             <NavbarEl />
             <div className="d-flex justify-content-between mt-5">
                 <Pagination className="flex-grow-1 justify-content-center">{items}</Pagination>
-                <Sidebar cart={cart}/>
+                <Button variant="light" className="me-5 position-fixed end-0 p-2" onClick={handleShow}>
+                    <ShoppingCartIcon fontSize="large" />
+                    <Badge className="position-absolute" pill bg="dark">
+                        {cart.length}
+                    </Badge>
+                </Button>
+
+                <Offcanvas placement="end" show={show} onHide={handleClose}>
+                    <Offcanvas.Header closeButton>
+                        <Offcanvas.Title>Carrello</Offcanvas.Title>
+                    </Offcanvas.Header>
+                    <Offcanvas.Body>
+                        <div>
+                            {cart.map((el, index) => (
+                                <div>
+                                    <ul>
+                                        <li className="d-flex justify-content-between align-items-center hoverEl">
+                                            <div className="d-flex">
+                                                <div>
+                                                    <CheckIcon className="text-success" />
+                                                    <img className="mx-3 widthImages" src={`/images/${el.filename}`} />
+                                                </div>
+                                                <div className="d-flex flex-column justify-content-center">
+                                                    <p className="mb-0">{el.title}</p>
+                                                    <p className="mb-0 fw-bold">{`${el.price}$`}</p>
+                                                </div>
+                                            </div>
+                                            <DeleteIcon role="button" onClick={() => deleteItem(index)}>delete</DeleteIcon>
+                                        </li>
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="d-flex mt-5">
+                            <h5>Totale:</h5>
+                            <h5 className="text-success ms-3 fw-bold">{`${total.toFixed(2)}$`}</h5>
+                        </div>
+                        <button className="btn btn-danger d-block" onClick={() =>  deleteAll()}>Cancella tutto</button>
+                    </Offcanvas.Body>
+                </Offcanvas>
             </div>
             <section className="d-flex flex-wrap justify-content-center">
                 {data.map((el, index) => index+1 <= pageActive*10 && index + 1 > pageActive*10-10 ? renderProduct(el) : null)}
